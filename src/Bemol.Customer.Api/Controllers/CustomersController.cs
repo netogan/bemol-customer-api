@@ -32,6 +32,10 @@ namespace Cash.Flow.Api.Controllers
         public async Task<ActionResult<Customer>> PostCustomer(AddCustomer customer)
         {
             var customerCreated = await _customerService.AddCustomer(customer);
+
+            if (customerCreated is null)
+                return BadRequest("Algum dado foi informado incorretamente.");
+
             return CreatedAtAction(nameof(GetCustomer), new { id = customerCreated.Id }, customer);
         }
 
