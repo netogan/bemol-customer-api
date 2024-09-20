@@ -1,0 +1,110 @@
+# Deployment of DB PostgreSQL
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:13
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_DB
+          value: "bemol-customer"
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_PASSWORD
+          value: "postgres"
+        volumeMounts:
+        - name: postgres-data
+          mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: postgres-data
+        emptyDir: {}
+---
+# Service of DB PostgreSQL
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-service
+spec:
+  selector:
+    app: postgres
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+---
+# ConfigMap of API with connection
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-customer-config
+data:
+  ConnectionStrings__DefaultConnection: "Host=postgres-service;Database=bemol-customer;Username=postgres;Password=postgres"
+---
+# Deployment of customerapi with dependency on db postgresql
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: customerapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: customerapi
+  template:
+    metadata:
+      labels:
+        app: customerapi
+    spec:
+      initContainers:
+      - name: init-postgres
+        image: busybox
+        command: ['sh', '-c', 'until nc -z postgres-service 5432; do echo waiting for postgres; sleep 2; done;']
+      containers:
+      - name: customerapi
+        image: docker.io/netogan/customerapi:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Production"
+        envFrom:
+        - configMapRef:
+            name: app-customer-config
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+---
+#Service of customerapi
+apiVersion: v1
+kind: Service
+metadata:
+  name: customerapi-service
+spec:
+  selector:
+    app: customerapi
+  type: LoadBalancer
+  ports:
+    - port: 8080
+      targetPort: 80

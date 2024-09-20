@@ -1,0 +1,6 @@
+@Bemol.Customer.Api_HostAddress = http://localhost:5197
+
+GET {{Bemol.Customer.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
