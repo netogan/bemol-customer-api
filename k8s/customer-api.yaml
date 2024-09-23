@@ -74,7 +74,7 @@ spec:
         command: ['sh', '-c', 'until nc -z postgres-service 5432; do echo waiting for postgres; sleep 2; done;']
       containers:
       - name: customerapi
-        image: docker.io/netogan/customerapi:latest
+        image: docker.io/netogan/bemol-customerapi:latest
         ports:
         - containerPort: 80
         env:
@@ -83,18 +83,6 @@ spec:
         envFrom:
         - configMapRef:
             name: app-customer-config
-        livenessProbe:
-          httpGet:
-            path: /api/health
-            port: 80
-          initialDelaySeconds: 10
-          periodSeconds: 30
-        readinessProbe:
-          httpGet:
-            path: /api/health
-            port: 80
-          initialDelaySeconds: 5
-          periodSeconds: 10
 ---
 #Service of customerapi
 apiVersion: v1
@@ -104,7 +92,8 @@ metadata:
 spec:
   selector:
     app: customerapi
-  type: LoadBalancer
+  type: NodePort
   ports:
     - port: 8080
       targetPort: 80
+      nodePort: 30007

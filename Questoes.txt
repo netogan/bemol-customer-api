@@ -1,0 +1,14 @@
+1. A solução deve ser disponibilizada em Cloud ou On-premise? 
+- Em cloud, pois não se limita fisicamente, tem alta disponibilidade e é mais rápido escalar.
+
+2. Considerando a participação de 4 pessoas técnicas para o desenvolvimento dessa solução, responda qual ferramenta acreditas ser apropriada para o controle de tarefas da equipe, a ferramenta é ágil?  
+- Crei que o azure boards seria ferramente aprópriada, tendo em vista que disponibiliza vários recursos para se utilizar e controlar o planejamento e os objetivos dos produtos.
+
+3. Você se sente capaz de liderar esta equipe? Por quê?  
+- Sim, já tive experiência liderando tecnicamente os times e creio que possa contribuir.
+
+4. Se pudesse sugerir uma melhoria, mudança ou oportunidade. O que seria?  
+- No momento não vejo nenhuma melhoria ou mudança.
+
+5. Acha válido esse desafio para o processo que está participando? 
+- Sim, para validar alguns conhecimentos faz sentido sim.

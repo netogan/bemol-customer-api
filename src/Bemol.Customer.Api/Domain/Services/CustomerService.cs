@@ -11,13 +11,17 @@ namespace Bemol.Customer.Api.Domain.Services
         public readonly ICustomerRepository _customerRepository;
         public readonly IViaCepService _viaCepService;
         private readonly IMapper _mapper;
+        private readonly ILogger<CustomerService> _logger;
 
-        public CustomerService(ICustomerRepository customerRepository, IViaCepService viaCepService, IMapper mapper)
+        public CustomerService(ICustomerRepository customerRepository, IViaCepService viaCepService, IMapper mapper,
+            ILogger<CustomerService> logger)
         {
             _customerRepository = customerRepository;
             _viaCepService = viaCepService;
             _mapper = mapper;
+            _logger = logger;
         }
+
         public async Task<Models.Customer> GetCustomer(int id)
         {
             return await _customerRepository.GetCustomer(id);
@@ -32,7 +36,12 @@ namespace Bemol.Customer.Api.Domain.Services
             if (string.IsNullOrWhiteSpace(zipCodeInfo.Logradouro))
                 return null;
 
-            return await _customerRepository.AddCustomer(customer);
+            var customerCreated = await _customerRepository.AddCustomer(customer);
+
+            _logger.LogInformation(
+                $"Cadastro realizado com sucesso. Nome do cliente: {customerCreated.FirstName} {customerCreated.FullName} Id: {customerCreated.Id}");
+
+            return customerCreated;
         }
 
         public async Task<Models.Customer> UpdateCustomer(Models.Customer customer)

@@ -34,9 +34,9 @@ namespace Cash.Flow.Api.Controllers
             var customerCreated = await _customerService.AddCustomer(customer);
 
             if (customerCreated is null)
-                return BadRequest("Algum dado foi informado incorretamente.");
+                return BadRequest("Endereço informado incorreto.");
 
-            return CreatedAtAction(nameof(GetCustomer), new { id = customerCreated.Id }, customer);
+            return new ObjectResult(customerCreated) { StatusCode = StatusCodes.Status201Created };
         }
 
         [HttpPut(RouteApi + "{id}")]
